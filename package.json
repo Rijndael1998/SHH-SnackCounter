@@ -28,7 +28,7 @@
     "@xyflow/react": "^12.6.4",
     "aes-js": "^3.1.2",
     "classnames": "^2.5.1",
-    "eslint": "^9.28.0",
+    "eslint": "^9.35.0",
     "eslint-config-next": "15.5.2",
     "jmuxer": "^2.0.7",
     "micromark-extension-gfm-footnote": "^2.1.0",
