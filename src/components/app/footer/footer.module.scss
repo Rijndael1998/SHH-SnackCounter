@@ -1,0 +1,71 @@
+@use "../../vars";
+@use "../../colors";
+
+.footer {
+    padding: 4ex 4ch;
+    background-color: colors.$secondaryBg;
+
+    display: grid;
+    grid-template-rows: auto 1fr;
+
+    font-family: var(--mono);
+    gap: 4ex;
+
+    margin-top: 3em;
+
+    & > * {
+        margin: auto;
+    }
+
+    .centre {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+
+        row-gap: 2ex;
+        column-gap: 2ch;
+
+        width: calc(100% - 2em);
+        max-width: calc(vars.$pageWidth * 2 - 2em);
+
+        div, a {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: auto;
+
+            p {
+                margin: .5ex auto;
+            }
+        }
+    }
+
+    .imageWrapper {
+        display: block;
+        margin: auto;
+    }
+
+    h1, h2, h3, h4, h5, h6, p {
+        display: flex;
+        align-items: center;
+        gap: 0.5ch;
+    }
+}
+
+@media screen and (max-width: vars.$footerBreakXl) {
+    .footer .centre {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+}
+
+@media screen and (max-width: vars.$footerBreak) {
+    .footer .centre {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media screen and (max-width: vars.$footerBreakXs) {
+    .footer .centre {
+        grid-template-columns: 1fr;
+    }
+}

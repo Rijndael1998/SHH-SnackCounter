@@ -1,0 +1,32 @@
+@use "../../../colors";
+
+.gridItem {
+    position: relative;
+
+    display: block;
+    aspect-ratio: 1;
+    height: 2em;
+
+    border: colors.$background 1px solid;
+
+    &,
+    * {
+        transition: all 0.2s ease;
+        animation-delay: inherit;
+    }
+
+    &>div {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+
+        opacity: 0;
+
+        $fore: colors.$bad;
+        $pr: colors.$idk;
+        $size: calc(100% / 4);
+        background: repeating-linear-gradient(135deg, $fore, $fore $size, $pr $size, $pr $size * 2);
+    }
+}

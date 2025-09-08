@@ -1,0 +1,56 @@
+@use "../../../colors";
+
+.Node {
+    background-color: colors.$idk;
+}
+
+.Wall {
+    background: colors.$background;
+}
+
+.Start {
+    background: colors.$nicePink;
+}
+
+.End {
+    background: colors.$nicePinkInv;
+}
+
+.Path {
+    background: colors.$text;
+    // animation: blink 2s ease infinite;
+    // animation-direction: reverse;
+}
+
+.Explored {
+    background: colors.$primaryDullDesat;
+}
+
+.Removed {
+    background: transparent;
+
+    div {
+        opacity: 1 !important;
+    }
+}
+
+@keyframes blink {
+    80% {
+        opacity: 1;
+    }
+
+    90% {
+        opacity: 0.5;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+// delay
+@for $i from 1 through 4 {
+    .d#{$i} {
+        animation-delay: #{$i}s;
+    }
+}

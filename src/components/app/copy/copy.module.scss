@@ -1,0 +1,37 @@
+@use "../../colors";
+
+.toolTipFix {
+    background-color: red !important;
+    min-width: 1ch;
+}
+
+.copyWrap {
+    perspective: 4ch;
+    position: relative;
+
+    width: 2ch;
+
+    &,
+    & > * {
+        transition: color 0.5s ease, transform 0.5s ease !important; // css files get compiled differently
+    }
+
+    .copy {
+        position: absolute;
+        z-index: 1;
+        transform: rotateY(-30deg) translateY(-50%);
+
+        color: white;
+        cursor: pointer;
+
+        &.copied,
+        &:hover {
+            transform: rotateY(0deg) translateY(-50%);
+        }
+
+        &.copied {
+            color: colors.$accent;
+            transform: rotateY(360deg) translateY(-50%);
+        }
+    }
+}

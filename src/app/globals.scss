@@ -1,0 +1,55 @@
+@use "../components/vars";
+@use "../components/colors";
+
+html {
+  position: relative;
+  min-height: 100%;
+  max-width: 100vw;
+
+  body {
+    margin: 0;
+    font-size: 1rem;
+
+    max-width: 100vw;
+    min-height: 100vh;
+
+    background-color: colors.$background;
+    color: colors.$text;
+
+    main {
+      width: 100%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    a {
+      color: colors.$text;
+      text-decoration-color: colors.$text;
+      transition: text-decoration-color 0.15s ease;
+
+      &:hover {
+        text-decoration-color: transparent;
+      }
+    }
+
+    nextjs-portal {
+      position: fixed;
+    }
+  }
+}
+
+pre {
+  display: block;
+  color: colors.$nicePink;
+
+  margin: 0;
+  min-width: 100%;
+  max-width: 1px; // This feels like a hack...
+  margin: 1em auto;
+
+  overflow-x: auto;
+}
+
+code {
+  color: colors.$nicePink;
+}

@@ -1,0 +1,22 @@
+$headerHeight: 8ch;
+
+/// breaks
+// nav bar
+$navBreak: 90ch; // When changing this, make sure to also change @/components/app/nav/fabnav/_fabnav.tsx
+
+// for title
+$titleBreak: 40ch;
+$titleBreakNone: 1ch; // TODO: remove
+
+// for footer
+$footerBreak: 80ch;
+$footerBreakXs: 60ch;
+$footerBreakL: 90ch;
+$footerBreakXl: 120ch;
+
+// values
+$buttonBorderRadius: 0.2rem;
+
+// general page size
+$pageWidth: 60ch;
+
