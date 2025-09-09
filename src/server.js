@@ -70,7 +70,7 @@ const snackList = [
     "value": 1.00,
   },
   {
-    "name": "Chrisps",
+    "name": "Crisps",
     "value": 0.40,
   },
   {
@@ -89,7 +89,7 @@ function emitLedger(socket) {
 
 function emitSnackList(socket) {
   console.log("sending snack list");
-  socket.emit("snack", JSON.stringify({
+  socket.emit("telem", JSON.stringify({
     "k": "snack",
     "v": snackList,
   }))

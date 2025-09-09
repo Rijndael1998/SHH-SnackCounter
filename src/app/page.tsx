@@ -1,10 +1,17 @@
 "use client";
 
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { IOContext } from './layout';
-import { Button, Grid2, Paper, Stack, SxProps, Theme, Typography } from '@mui/material';
+import { Button, Grid2, IconButton, Paper, Stack, Typography } from '@mui/material';
 import Users, { UserCallback, UsersType, UserType } from '@/components/app/core/Users';
 import { ifTrue } from '@/components/reactUtils';
+import { FormatUKMoney } from '@/components/util';
+
+// Icons
+import AddIcon from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
+import DeleteIcon from '@mui/icons-material/Delete';
+
 
 enum PageStates {
     LOADING, // not used yet
@@ -75,18 +82,101 @@ type AddSnackToUserProps = {
 } & MainPageProps & UserSelection;
 
 function AddSnackToUser({ snacks, userName, users, open }: AddSnackToUserProps) {
+    // map between snack count and 
+    const [snackCount, setSnackCount] = useState<Map<string, number>>(new Map());
+
+    const up = (e: React.MouseEvent<HTMLElement>) => {
+        const snack = e.currentTarget.dataset.snack;
+        if (!snack)
+            throw new Error("no snack datatype")
+
+        const newSnackCount = new Map(snackCount);
+        newSnackCount.set(snack, (newSnackCount.get(snack) ?? 0) + 1)
+        setSnackCount(newSnackCount);
+    }
+
+    const down = (e: React.MouseEvent<HTMLElement>) => {
+        const snack = e.currentTarget.dataset.snack;
+        if (!snack)
+            throw new Error("no snack datatype")
+
+        const newSnackCount = new Map(snackCount);
+        newSnackCount.set(snack, (newSnackCount.get(snack) ?? 0) - 1)
+        setSnackCount(newSnackCount);
+    }
+
+    const reset = (e: React.MouseEvent<HTMLElement>) => {
+        const snack = e.currentTarget.dataset.snack;
+        if (!snack)
+            throw new Error("no snack datatype")
+
+        const newSnackCount = new Map(snackCount);
+        newSnackCount.set(snack, 0)
+        setSnackCount(newSnackCount);
+    }
+
     if (!open)
         return <></>;
 
     return <>
-        <Typography variant='h1'>Add snack</Typography>
-        <Grid2 container>
-            {snacks.map(v => {
-                return <Grid2 key={v.name}>
-                    {v.name}{" - "}{v.value}
+        <Typography variant='h1' mb={2}>Add snack</Typography>
+        <Grid2 container gap={1}>
+            {snacks.map(snack => {
+                const currentCount = snackCount.get(snack.name) ?? 0;
+
+                return <Grid2
+                    key={snack.name}
+                    sx={{
+                        width: "20ch",
+                        maxWidth: "calc(100% - 2ch)",
+                        textAlign: "centre",
+                        margin: "auto",
+                    }}>
+                    <Paper elevation={5} sx={{
+                        padding: "0.5em",
+                        marginY: "0.5em",
+                    }}>
+                        <Typography variant='h2'>{snack.name}</Typography>
+                        <Typography variant="subtitle1">{FormatUKMoney(snack.value)}</Typography>
+                        <Stack direction={"row"} sx={[{
+                            "*": {
+                                transition: "ease 0.2s all",
+                            }
+                        }]}>
+                            <IconButton data-snack={snack.name} onClick={up}>
+                                <AddIcon />
+                            </IconButton>
+                            <IconButton data-snack={snack.name} onClick={down}>
+                                <RemoveIcon />
+                            </IconButton>
+                            <span style={{ margin: "auto auto" }}>
+                                {currentCount}
+                            </span>
+                            <IconButton
+                                data-snack={snack.name}
+                                disabled={currentCount == 0}
+                                onClick={reset}>
+                                <DeleteIcon />
+                            </IconButton>
+                        </Stack>
+                    </Paper>
                 </Grid2>
             })}
         </Grid2>
+        <Typography variant='h1'>Summary</Typography>
+        {
+            [...snackCount].map(v => {
+                const [name, quantity] = v;
+                const snack = snacks.filter(v => v.name == name)[0];
+                const total = snack.value * quantity;
+
+                if (total != 0)
+                    return <Stack direction={"row"} style={{borderBottom: "0.1ex dotted #aaa", fontFamily: "var(--mono)"}}>
+                        <p style={{margin: "0 2ch 0 0"}}>{`${quantity} ${name} @ ${FormatUKMoney(snack.value)}`}</p>
+                        <p style={{margin: "0 2ch 0 auto"}}>{FormatUKMoney(total)}</p>
+                    </Stack>
+            })
+        }
     </>
 };
 
@@ -113,6 +203,7 @@ export default function Home() {
     const [usersState, setUsersState] = useState<UsersType>();
     const [snackState, setSanckState] = useState<SnackState[]>([]);
 
+    // callbacks changing state
     const [pageState, setPageState] = useState<PageStates>(PageStates.LOADING);
     const [displayUser, setDisplayUser] = useState<UserType["name"]>(); // we will user userIDs for the other component
 
