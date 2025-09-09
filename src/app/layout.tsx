@@ -68,7 +68,7 @@ export default function RootLayout({
         <body className={`${style.body} ${fontClassStrings}`}>
           <header>
             <Header>
-              <Title text="PairNote" />
+              <Title text="Snack Counter" />
             </Header>
           </header>
           <DarkModeFix>

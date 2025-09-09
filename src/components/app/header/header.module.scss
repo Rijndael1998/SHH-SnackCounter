@@ -15,6 +15,12 @@
     filter: hue-rotate(0deg);
     transition: all 1s ease;
 
+    border-bottom: 0.2em solid #111;
+
+    p {
+        margin: 0;
+    }
+
     * {
         font-family: inherit;
     }

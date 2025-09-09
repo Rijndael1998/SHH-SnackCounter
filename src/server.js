@@ -6,6 +6,65 @@ const { Server } = require("socket.io");
 const app = next({ dev: process.env.NODE_ENV !== 'production' });
 const handle = app.getRequestHandler();
 
+const testvalues = [
+    {
+        "name": "Alice Johnson",
+        "value": -120.5
+    },
+    {
+        "name": "Ben Carter",
+        "value": 340
+    },
+    {
+        "name": "Chloe Singh",
+        "value": -15
+    },
+    {
+        "name": "Daniel O'Neill",
+        "value": 0
+    },
+    {
+        "name": "Eva Müller",
+        "value": 89.99
+    },
+    {
+        "name": "Faisal Khan",
+        "value": -2300
+    },
+    {
+        "name": "Grace Liu",
+        "value": 12.5
+    },
+    {
+        "name": "Hugo Martín",
+        "value": -0.75
+    },
+    {
+        "name": "Isabella Rossi",
+        "value": 760
+    },
+    {
+        "name": "Jack Thompson",
+        "value": -450
+    },
+    {
+        "name": "Keiko Tanaka",
+        "value": 25.2
+    },
+    {
+        "name": "Liam Murphy",
+        "value": 10450.33
+    }
+];
+
+function emitLedger(socket) {
+  console.log("sending ledger");
+  socket.emit("telem", JSON.stringify({
+    "k": "ledger",
+    "v": testvalues,
+  }));
+}
+
 app.prepare().then(() => {
   const server = createServer((req, res) => {
     const parsedUrl = parse(req.url, true);
@@ -17,9 +76,15 @@ app.prepare().then(() => {
   io.on('connection', socket => {
     console.log('Client connected');
 
+    emitLedger(socket); // if the server restarts, the ledger should be sent to any connected client
+
     socket.on('disconnect', () => {
       console.log('Client disconnected');
     });
+
+    socket.on("ledger", () => {
+      emitLedger(socket);
+    })
 
   });
 

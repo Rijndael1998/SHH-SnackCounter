@@ -11,3 +11,13 @@ export const CopyToClipboard = async (text: string) => {
 export const ChooseRandomElement = <T>(array: Array<T>) => {
     return array[Math.floor(Math.random() * array.length)];
 }
+
+export function FormatUKMoney(num: number) {
+    if (!Number.isFinite(num)) {
+        throw new TypeError('Value must be a finite number');
+    }
+    return new Intl.NumberFormat('en-GB', {
+        style: 'currency',
+        currency: 'GBP' // £
+    }).format(num);
+}

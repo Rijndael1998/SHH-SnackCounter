@@ -16,8 +16,25 @@ export default function Header({ children }: { children: ReactNode }): JSX.Eleme
     const degRotation = io ? 0 : -115;
 
     return <>
-        <div style={{ filter: `hue-rotate(${degRotation ?? 0}deg)` }} className={classNames(headerStyles.header, red && headerStyles.red)}>
+        <div className={classNames(headerStyles.header, red && headerStyles.red)}>
             {children}
+            <div style={{
+                marginRight: "1em",
+                display: "flex",
+                flexDirection: "column",
+                textAlign: "right",
+            }}>
+                <p>
+                    {"This is a test ledger system."}
+                </p>
+                <p>
+                    {"(ask Lukasz)"}
+                </p>
+                <p />
+                <p>
+                    {"Connected: "}{io !== undefined ? "Yes" : "No"}
+                </p>
+            </div>
         </div>
     </>
 }
