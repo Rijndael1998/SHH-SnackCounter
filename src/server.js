@@ -79,6 +79,14 @@ const snackList = [
   }
 ]
 
+function findSnack(name) {
+  return snackList.filter(v => v.name == name)[0];
+}
+
+function findUser(name) {
+  return testvalues.filter(v => v.name == name)[0];
+}
+
 function emitLedger(socket) {
   console.log("sending ledger");
   socket.emit("telem", JSON.stringify({
@@ -124,9 +132,27 @@ app.prepare().then(() => {
 
     socket.on("snack_spent", (e) => {
       console.log("snack_spent");
-      console.log(e);
-      console.log(JSON.parse(e));
-    })
+      const data = JSON.parse(e);
+      console.log(data);
+
+      const user = data["userName"]; // string
+      const snackCount = data["snackCount"]; // [snack: string, quantity: number]
+
+      // find cost of snack
+      let cost = 0;
+      snackCount.map(v => {
+        const [snack, quantity] = v;
+        const snackObj = findSnack(snack);
+        cost += snackObj.value * quantity;
+      });
+
+      console.log(`applying ${cost} to ${user}`);
+      const userObj = findUser(user);
+      userObj.value = userObj.value - cost;
+
+      // emit change to everyone
+      emitLedger(io);
+    });
 
   });
 
