@@ -79,47 +79,82 @@ function UserDetails({ open, userName, users, snackCallback }: UserDetailsProps)
 
 type AddSnackToUserProps = {
     snacks: SnackState[],
-} & MainPageProps & UserSelection;
+    addedSnackCallback: () => any,
+    userName: UserSelection["userName"],
+} & MainPageProps;
 
-function AddSnackToUser({ snacks, userName, users, open }: AddSnackToUserProps) {
+function AddSnackToUser({ snacks, userName, open, addedSnackCallback }: AddSnackToUserProps) {
     // map between snack count and 
     const [snackCount, setSnackCount] = useState<Map<string, number>>(new Map());
 
-    const up = (e: React.MouseEvent<HTMLElement>) => {
+    const totalSnackCost = [...snackCount].map(v => { // we're just calculating the sum of the snacks here
+        const [name, quantity] = v;
+        const snack = snacks.filter(v => v.name == name)[0];
+        return snack.value * quantity;
+    }).reduce<number>((p, c) => p + c, 0);
+
+    const io = useContext(IOContext);
+
+    const getSnack = (e: React.MouseEvent<HTMLElement>) => {
         const snack = e.currentTarget.dataset.snack;
         if (!snack)
-            throw new Error("no snack datatype")
+            throw new Error("no snack datatype");
 
+        return snack;
+    }
+
+    const snackDelta = (snack: string, delta: number) => {
         const newSnackCount = new Map(snackCount);
-        newSnackCount.set(snack, (newSnackCount.get(snack) ?? 0) + 1)
+        const newCount = (newSnackCount.get(snack) ?? 0) + delta;
+        if (newCount != 0)
+            newSnackCount.set(snack, newCount);
+        else
+            newSnackCount.delete(snack);
+
+        return newSnackCount;
+    }
+
+    const up = (e: React.MouseEvent<HTMLElement>) => {
+        const snack = getSnack(e);
+        const newSnackCount = snackDelta(snack, 1);
         setSnackCount(newSnackCount);
     }
 
     const down = (e: React.MouseEvent<HTMLElement>) => {
-        const snack = e.currentTarget.dataset.snack;
-        if (!snack)
-            throw new Error("no snack datatype")
-
-        const newSnackCount = new Map(snackCount);
-        newSnackCount.set(snack, (newSnackCount.get(snack) ?? 0) - 1)
+        const snack = getSnack(e);
+        const newSnackCount = snackDelta(snack, -1);
         setSnackCount(newSnackCount);
     }
 
     const reset = (e: React.MouseEvent<HTMLElement>) => {
-        const snack = e.currentTarget.dataset.snack;
-        if (!snack)
-            throw new Error("no snack datatype")
+        const snack = getSnack(e);
 
         const newSnackCount = new Map(snackCount);
-        newSnackCount.set(snack, 0)
+        newSnackCount.delete(snack);
         setSnackCount(newSnackCount);
     }
 
-    if (!open)
+    const spendSnacks = () => {
+        if(!io)
+            return;
+
+        setSnackCount(new Map());
+        
+        const payload = JSON.stringify({
+            userName,
+            snackCount: [...snackCount],
+        });
+        console.log(payload);
+        io.emit("snack_spent", payload);
+
+        addedSnackCallback();
+    }
+
+    if (!open || !io)
         return <></>;
 
     return <>
-        <Typography variant='h1' mb={2}>Add snack</Typography>
+        <Typography variant='h1' mb={2}>Add snack for {userName}</Typography>
         <Grid2 container gap={1}>
             {snacks.map(snack => {
                 const currentCount = snackCount.get(snack.name) ?? 0;
@@ -171,12 +206,28 @@ function AddSnackToUser({ snacks, userName, users, open }: AddSnackToUserProps) 
                 const total = snack.value * quantity;
 
                 if (total != 0)
-                    return <Stack direction={"row"} style={{borderBottom: "0.1ex dotted #aaa", fontFamily: "var(--mono)"}}>
-                        <p style={{margin: "0 2ch 0 0"}}>{`${quantity} ${name} @ ${FormatUKMoney(snack.value)}`}</p>
-                        <p style={{margin: "0 2ch 0 auto"}}>{FormatUKMoney(total)}</p>
+                    return <Stack direction={"row"} style={{ borderBottom: "0.1ex dotted #aaa", fontFamily: "var(--mono)" }}>
+                        <p style={{ margin: "0 2ch 0 0" }}>{`${quantity} ${name} @ ${FormatUKMoney(snack.value)}`}</p>
+                        <p style={{ margin: "0 2ch 0 auto" }}>{FormatUKMoney(total)}</p>
                     </Stack>
             })
         }
+
+        <Typography variant='h2' mt={2}>
+            {totalSnackCost > 0 ? "Total" : "Refunded Total"}
+        </Typography>
+        <p style={{ margin: "0", fontFamily: "var(--mono)" }}>
+            {FormatUKMoney(Math.abs(totalSnackCost))}
+        </p>
+
+        <Stack direction={"row"}>
+            <Button
+                variant='contained'
+                style={{ margin: "2em 0 0 auto" }}
+                onClick={spendSnacks}>
+                Apply Snacks
+            </Button>
+        </Stack>
     </>
 };
 
@@ -297,15 +348,16 @@ export default function Home() {
                     users={usersState!}
                     snackCallback={showSnackPage}
                 />
-                <AddSnackToUser
-                    open={pageState == PageStates.FOOD}
-                    userName={displayUser}
-                    users={usersState!}
-                    snacks={snackState}
-                />
+
 
             </>)}
 
+            <AddSnackToUser
+                open={pageState == PageStates.FOOD}
+                userName={displayUser}
+                snacks={snackState}
+                addedSnackCallback={() => setPageState(PageStates.LEDGER)}
+            />
         </Paper>
         {/* <Paper sx={{ padding: "0.5em", marginTop: "2ex" }}>
             Connected: {isConnected ? "Yes" : "No"}

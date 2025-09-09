@@ -122,6 +122,12 @@ app.prepare().then(() => {
       emitSnackList(socket);
     });
 
+    socket.on("snack_spent", (e) => {
+      console.log("snack_spent");
+      console.log(e);
+      console.log(JSON.parse(e));
+    })
+
   });
 
   server.listen(3000, (err) => {
