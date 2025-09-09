@@ -63,6 +63,7 @@ function UserDetails({ open, userName, users, snackCallback, returnCallback }: U
     const user = users.filter(v => v.name == userName)[0];
 
     const deleteAccount = () => {
+        // TODO: make this get really upset
         io.emit("user_delete", userName);
         returnCallback();
     }
