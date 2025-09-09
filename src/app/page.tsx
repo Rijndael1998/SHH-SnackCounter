@@ -50,18 +50,26 @@ type UserSelection = {
 
 type UserDetailsProps = {
     snackCallback: UserCallback;
+    returnCallback: () => any;
 } & MainPageProps & UserSelection;
 
-function UserDetails({ open, userName, users, snackCallback }: UserDetailsProps) {
-    if (!open || userName === undefined)
+function UserDetails({ open, userName, users, snackCallback, returnCallback }: UserDetailsProps) {
+    const io = useContext(IOContext);
+
+    if (!open || userName === undefined || !io)
         return <></>
 
     // fresh user if details change
     const user = users.filter(v => v.name == userName)[0];
 
+    const deleteAccount = () => {
+        io.emit("user_delete", userName);
+        returnCallback();
+    }
+
     return <>
         <Typography variant='h1'>{userName}</Typography>
-        <Typography variant='body1'>Balance {user.value}</Typography>
+        <Typography variant='body1'>Balance {FormatUKMoney(user.value)}</Typography>
 
         <Stack direction="row" gap={1}>
             <Button variant='contained' onClick={() => snackCallback(user)}>
@@ -70,7 +78,11 @@ function UserDetails({ open, userName, users, snackCallback }: UserDetailsProps)
             <Button variant='contained' color="secondary">
                 Add Money
             </Button>
-            <Button variant='contained' color="error" sx={{ marginLeft: "auto" }}>
+            <Button
+                variant='contained'
+                color="error"
+                sx={{ marginLeft: "auto" }}
+                onClick={() => deleteAccount()}>
                 Delete Account
             </Button>
         </Stack>
@@ -135,11 +147,11 @@ function AddSnackToUser({ snacks, userName, open, addedSnackCallback }: AddSnack
     }
 
     const spendSnacks = () => {
-        if(!io)
+        if (!io)
             return;
 
         setSnackCount(new Map());
-        
+
         const payload = JSON.stringify({
             userName,
             snackCount: [...snackCount],
@@ -206,7 +218,11 @@ function AddSnackToUser({ snacks, userName, open, addedSnackCallback }: AddSnack
                 const total = snack.value * quantity;
 
                 if (total != 0)
-                    return <Stack direction={"row"} style={{ borderBottom: "0.1ex dotted #aaa", fontFamily: "var(--mono)" }}>
+                    return <Stack
+                        key={name}
+                        direction={"row"}
+                        style={{ borderBottom: "0.1ex dotted #aaa", fontFamily: "var(--mono)" }}
+                    >
                         <p style={{ margin: "0 2ch 0 0" }}>{`${quantity} ${name} @ ${FormatUKMoney(snack.value)}`}</p>
                         <p style={{ margin: "0 2ch 0 auto" }}>{FormatUKMoney(total)}</p>
                     </Stack>
@@ -347,6 +363,7 @@ export default function Home() {
                     userName={displayUser}
                     users={usersState!}
                     snackCallback={showSnackPage}
+                    returnCallback={() => setPageState(PageStates.LEDGER)}
                 />
 
 

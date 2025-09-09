@@ -149,7 +149,16 @@ app.prepare().then(() => {
       console.log(`applying ${cost} to ${user}`);
       const userObj = findUser(user);
       userObj.value = userObj.value - cost;
+      userObj.value = Math.round(userObj.value * 100) / 100; // fix floatpoint bs
 
+      // emit change to everyone
+      emitLedger(io);
+    });
+
+    socket.on("user_delete", user => {
+      console.log("deleting", user);
+      testvalues.splice(testvalues.indexOf(findUser(user)), 1);
+  
       // emit change to everyone
       emitLedger(io);
     });
